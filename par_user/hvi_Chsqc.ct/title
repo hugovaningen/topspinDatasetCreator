@@ -1,0 +1,8 @@
+13C-HSQC w/ constant-time,  w/sensitivity enhancement, w/adiabatic bilevel decoupling, w/ CO decoupling
+--- aliphatic region only !!! ---
+--- 1 neighbour aliphatic C = positive; 2 neighbour aliphatic C = negative ---
+
+1. getprosol 1H 8.45 -11 13C 13 135W 15N 43.5 190W (subsitute your puls-lengths, use 15N at 190W!)
+2. adjust NS, O2P, TD1 and SW1 to your needs (t1,max is 22ms for maximum resolution)
+3. zg;xfbla
+4. activate qpol in F2, edp for more water suppression

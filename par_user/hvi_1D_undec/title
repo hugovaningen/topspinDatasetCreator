@@ -1,0 +1,6 @@
+1H 1D w/o decoupling w / excitation sculpting watersuppression
+
+1. p1 1H_90_degree_value (at pldb1 -11 dB/12.6 W)
+2. o1 water_offset_value
+3. change NS, AQ to your needs (for long AQ (>0.5sec) better to use zgesgppe)
+4. zg; qfp; apk0

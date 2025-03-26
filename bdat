@@ -1,0 +1,110 @@
+#!/bin/bash
+
+if [[ -f sample.txt ]] ; then
+	rm sample.txt
+	rm dataset.txt
+fi
+
+if [[ -f README ]] ; then
+	rm README
+fi
+
+# take only directories names 1 - 99999999
+listOfExpnos=`ls -l | grep '^d' | awk '{print $9}' | grep '^[0-9]' |  sed 's/\///' | grep '[0-9]$' | sort -n`
+
+touch sample.txt
+
+echo "*** README *** " > README
+echo "" >> README
+
+for expno in $listOfExpnos ; do
+	if [[ -d $expno ]]; then
+		cd $expno
+		if [[ -f ser ]] ||[[ -f fid ]]; then
+			# get sample
+			titleFile=`find . -name title | head -1`
+			if [[ $titleFile != "" ]] ; then
+				protein=`grep ^protein $titleFile`
+				buffer=`grep ^buffer $titleFile`
+				#echo $expno, $protein, $buffer
+				echo $protein >> ../sample.txt
+				echo $buffer >> ../sample.txt
+				# get experiment (top + last lines of title)
+				exp1=`head -1 $titleFile`
+				#exp2=`tail -1 $titleFile`
+			else
+				protein=""
+				buffer=""
+				exp1=""
+				exp2=""
+			fi
+			if [[ -f acqus ]] ; then
+				date=$(grep '^\$\$' acqus | head -1 | awk '{print $2, $3}')
+				machine=$(grep '^\$\$' acqus | head -1 | awk '{print $5}')
+				dataset=$(grep '^\$\$' acqus | head -2 | tail -1 | awk '{split($2,a,"/");for (i=2;i<length(a)-1;i++){printf("/%s",a[i])}printf("\n")}')
+				process=$(grep '^\$\$' acqus | head -3 | tail -1 | awk '{split($3,a,"/");printf a[3]}')
+				echo "   date: " $date >> ../dataset.txt
+				echo "machine: " $machine >> ../dataset.txt
+				echo "dataset: " $dataset >> ../dataset.txt
+				echo "process: " $process >> ../dataset.txt
+			fi
+			if [[ -f pulseprogram ]] ; then
+				if [[ $process != "topspin3.2" ]] ; then
+					# for topspin 3.5 remove first line; then get second line = original line
+					exp0=`grep -v '^#' pulseprogram | head -1 | sed 's/\;//' | awk '{print $1}'`
+				else
+					exp0=`head -1 pulseprogram | awk '{split($3,a,"/");print a[length(a)]}' | sed 's/\"//'`
+				fi
+			elif [[ -f pulseprogram.precomp ]] ; then
+					# for topspin 4.1.4 use pulseprogram.precomp file, extract from 1st line
+					exp0=`head -1 pulseprogram.precomp | awk '{print $3}' | sed 's/\"//g' | awk '{n=split($1,a,"/");print a[n]}'`
+			else
+				exp0=""
+			fi
+			#printf "%10d\t%20s\t%s\n\t\t\t\t\t\t%s\n" $expno $exp0 "$exp1" "$exp2" >> ../README.tmp
+			printf "%10d\t%20s\t%s\n" $expno $exp0 "$exp1" >> ../README.tmp
+			cd ..
+		else
+			cd ..
+			# remove expno without recorded data -- only if argument is "y"
+			if [[ $1 == "y" ]] ; then
+				rm -rf $expno
+			fi
+		fi
+	fi
+done
+
+grep protein sample.txt | sort | uniq -c | sort > tmp
+grep buffer sample.txt | sort | uniq -c | sort >> tmp
+mv tmp sample.txt
+
+grep date dataset.txt | sort | head -1  > tmp
+grep date dataset.txt | sort | tail -1  >> tmp
+grep machine dataset.txt | sort | uniq -c | sort >> tmp
+grep dataset dataset.txt | sort | uniq -c | sort >> tmp
+grep process dataset.txt | sort | uniq -c | sort >> tmp
+mv tmp dataset.txt
+
+echo "DATASET:" >> README
+echo "" >> README
+cat README dataset.txt > tmp
+mv tmp README
+
+echo "" >> README
+echo "SAMPLE:" >> README
+echo "" >> README
+cat README sample.txt > tmp
+mv tmp README
+
+echo "" >> README
+echo "EXPNO:" >> README
+echo "" >> README
+
+cat README README.tmp > tmp
+mv tmp README 
+rm README.tmp
+rm dataset.txt
+rm sample.txt
+cat README
+
+

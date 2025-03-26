@@ -1,0 +1,7 @@
+15N pulse calibration @ plw0/pldb0, maximum power pldb0=pldb3 -24.31 dB / 270 W
+
+1. p1 1H_90_degree_value (at pldb1 -11 dB/12.6 W)
+2. -p0 0; zg; qfp; apk0; wrp 2 y  (maximum positive signal, reference)
+    -p0 90_degree_value; zg; qfp; .md; rep 2 (zero signal)
+    for high power (270W) calibration, change p0 and p21 simultaneously
+    for low power calibration, set cnst21 to 15N offset of isolated peak

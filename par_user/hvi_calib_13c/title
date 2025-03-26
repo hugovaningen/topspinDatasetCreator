@@ -1,0 +1,9 @@
+13C pulse calibration -- !! methyl signals only  !!--
+
+1. set p1 to 1H 90 degree pulse length at -11 dB
+2. calibrate 13C 90 degree pulse @ plw0/pldb0
+     for high power pulse calibration (pldb0=pldb2 -21.3 dB / 135 W)
+    -p0 0; zg; qfp; apk0; wrp 2 y  ==> maximum positive signal
+    -p0 90_degree_value; zg; qfp; .md; rep 2 ==> zero signal of methyls
+    for high power (135W) calibration, change p0 and p3 simultaneously
+    for low power calibration, set cnst21 to 13C offset of isolated peak

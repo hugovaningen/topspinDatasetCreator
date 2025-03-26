@@ -1,0 +1,10 @@
+1H 1D w/ broadband decoupling w / excitation sculpting watersuppression
+
+---- keep AQ limited to 64 ms max!  -----
+w/ broadband adiabatic 13C decoupling at 60ppm w/ Crp54
+and low power GARP4 15N decoupling at 320us
+
+1. p1 1H_90_degree_value (at pldb1 -11 dB/12.6 W)
+2. o1 water_offset_value
+3. change NS to your needs (!keep AQ at 64ms maximum!)
+4. zg; qfp; apk0

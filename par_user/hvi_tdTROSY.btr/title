@@ -1,0 +1,7 @@
+15N TROSY  w / fast pulsing (Tammo Diercks version)
+
+1. p1 1H_90_degree_value (at pldb1 -11 dB/12.6 W)
+2. p7 15N_90_degree_value ( at pldb3 -24.31 dB / 270W)
+3. p3 13C_90_degree_value ( at pldb2 -21.30 dB / 135W)
+4. adjust NS, TD1, SW1 to your needs, keep DS > 32
+5 . zg; xfbla

@@ -1,0 +1,143 @@
+;hvi_calib_15n
+;
+; FROM 900
+; based on hvi_calib_15n
+;	HvI, May 2011
+;	changed calibration pulse to be 90 in z-filter period
+;	to remove off-res dependent phase problems and have
+;	pure amplitude modulation of signal
+;
+; USAGE:  - 90 degree is no signal!
+;         - 0 degree is full signal!
+;
+;$CLASS=HighRes
+;$DIM=1D
+;$TYPE=
+;$SUBTYPE=
+;$COMMENT=
+
+#include <Avance.incl>
+#include <Grad.incl>
+#include <Delay.incl>
+
+; DEFINE PARAMETERS:
+
+"p2=p1*2"
+"p22=p21*2"
+"d11=30m"
+"d13=20u"
+"d18=d19-p21"
+"d26=1s/(cnst4*4)"
+"DELTA1=d26-p16-d13-4u-d19*5-p1*2.385"
+"d23=0.25/cnst22"
+"COUNTER=0.5*d25/d23"
+
+; START PULSE SEQUENCE
+
+1 ze
+    d11 pl16:f3
+2   d1 do:f3
+    d11 fq=0:f3	; switch back offset
+    3u pl1:f1
+3 (p1 ph10)					; forward INEPT
+    d26 pl3:f3
+  (center (p2 ph10) (p22 ph10):f3 )
+    d26 UNBLKGRAD
+  (p1 ph11)					; back to z and do calibration
+    4u
+    d13 fq=cnst21 (bf ppm):f3			; switch offset
+    d13 pl0:f3					; switch power
+#ifdef CPMG
+4   d23
+   (p0*2 ph10):f3				; 180 CPMG
+    d23
+  lo to 4 times COUNTER
+#endif 
+    d16
+    p16:gp1*0.7					; make sure to act only on z-magnetization
+    d16
+  (p0 ph10):f3					; calibration pulse 
+    d13 pl3:f3					; switch back power
+    p16:gp1					; cleanup gradient 1
+    d13 fq=0:f3	; switch back offset
+    d16
+  (p21 ph13):f3					; regular back transfer
+    50u
+  (p22 ph10):f3
+    50u
+  (ralign (p1 ph10) (p21 ph14):f3 )		; reverse INEPT w/ 3-9-19 watergate
+    d13
+    p16:gp2
+    DELTA1
+    4u
+
+  (p1*0.231 ph20)				; 3-9-19 watergate
+   d19*2 
+  (p1*0.692 ph20)
+   d19*2 
+  (p1*1.462 ph20)
+   d18
+  (p22 ph10):f3
+   d18
+  (p1*1.462 ph21)
+   d19*2 
+  (p1*0.692 ph21) 
+   d19*2 
+  (p1*0.231 ph21)
+
+    d13
+    p16:gp2
+    DELTA1 pl16:f3
+    4u BLKGRAD
+  go=2 ph31 cpd3:f3
+    d1 do:f3 wr #0
+exit
+  
+ph10=0 				; fixed x-phase
+ph11=1				; fixed y-phase
+ph13=0 2			; first 90 15N
+ph14=0 0 2 2			; second 90 15N
+ph20=0				; watergate phase 1
+ph21=2				; watergate phase 2
+ph31=0 2 2 0 	; receiver phase
+  
+
+;pl1 : 1H high power
+;p1  : 1H high power 90
+;p2  : 1H high power 180
+;pl3 : 15N high power
+;p21 : 15N high power 90
+;p22 : 15N high power 180
+;pl0 : 15N calibration pulse power
+;p0  : 15N calibration pulse 0/90
+;pl16: 15N decoupling power
+;cpd3: 15N decoupling defined by cpdprg3
+;pcpd3: 15N decoupling 90
+
+;cnst21: offset calibration pulse
+;cnst22: vCPMG strength
+;d25 : total vCPMG delay
+;d23 : tau_cp
+;COUNTER : no. of loops
+;cnst4: = J(NH)
+;d26 : 1/(4J(NH)) via cnst4
+
+;p16 : PFG gradient pulse                         [1 msec]
+;d16 : delay for gradient recovery
+;d19 : ~ 1-2*DW (3-9-19 watergate delay)
+
+;d1  : relaxation delay
+;d11 : delay for disk I/O                               [30 msec]
+;d13 : short delay                                      [20 usec]
+
+;for z-only gradients:
+;gpz1: 50% cleanup z-filter
+;gpz2: 20% cleanup final INEPT	
+
+;use gradient files:   
+;gpnam1: SINE.100
+;gpnam2: SINE.100
+
+
+
+;$Id: hsqcetf2gp,v 1.4 2007/04/11 13:34:30 ber Exp $

@@ -1,0 +1,7 @@
+13C-HMQC broadband (ali+aro) w/ water presat, w/ adiabatic bilevel decoupling
+
+1. getprosol 1H 8.45 -11 13C 13 135W 15N 43.5 190W (subsitute your puls-lengths, use 15N at 190W!)
+2. reduce pl9 water presat to 50-60 dB, optimize o1 in gs for flat FID
+3. adjust NS, O2P, TD1 and SW1 to your needs (t1,max is ~6ms since not constant-time)
+4. zg;xfbla
+5. activate qpol in F2, edp for more water suppression
